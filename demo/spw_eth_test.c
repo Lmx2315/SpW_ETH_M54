@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <assert.h>
-
+#include <math.h>
 #include <Windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -75,17 +75,9 @@ unsigned print_send = 1, print_rec = 1;
 char strng[64];
 char msg[Bufer_size];
 char buff[64000];//буфер UDP смотри в main.c
-unsigned int text_lengh=0;
+unsigned int idx=0;
 
-void Transf (char * s)
-{
-	unsigned int l=0;
-	unsigned int i=0;
-	l=strlen(s);
-	if ((text_lengh+l)>Bufer_size-5) text_lengh=0;
-	for (i=text_lengh;i<(text_lengh+l);i++) msg[i]=s[i-text_lengh];
-	text_lengh=text_lengh+l;
-}
+
 
 #define PORT 666    // порт сервера
 int UDP_init()
@@ -144,13 +136,52 @@ void UDP_transmit (int k)
     int l=0;
 
     for (i=0;i<k;i++)
-    {
+    {        
         buff[i]=buf2[i];
  //     printf ("buff[i]:%x\n",buff[i]);
     }
     UDP_work(k);
 }
+//----------------------------------------
 
+void data_out (int a)
+{
+    buf2[3+idx]=(a>>24)&0xff;
+    buf2[2+idx]=(a>>16)&0xff;
+    buf2[1+idx]=(a>> 8)&0xff;
+    buf2[0+idx]=(a>> 0)&0xff;
+    idx=idx+4;
+}
+
+void test_to_data ( int size)
+{
+     int i=0;
+    size=size/4;
+    unsigned int reg = 0;
+    double A1=1000;
+    double A2=2000;
+    double A3=100;
+    double F1=0;
+    double F2=0;
+    double F3=0;
+    double freq1=0;
+    double freq2=400;
+    double freq3=700;
+    double Fclk=6250;//KHz
+    double pi=3.1415926535;
+
+    idx=0;
+
+  for(i=0;i<size;i++)//изменил начало индекса!!!!
+    {
+        F1=((int)(A1*(cos(i*2*pi*freq1/Fclk)))<<16)+A1*(sin(i*2*pi*freq1/Fclk));
+        F2=((int)(A2*(cos(i*2*pi*freq2/Fclk)))<<16)+A2*(sin(i*2*pi*freq2/Fclk));
+        F3=((int)(A3*(cos(i*2*pi*freq3/Fclk)))<<16)+A3*(sin(i*2*pi*freq3/Fclk));
+        reg=F1+F2+F3;
+        data_out(reg);
+//      printf ("reg:%d\n",reg);
+    }
+}
 
 //----------------------------------------
 
@@ -397,7 +428,8 @@ void Receive_SinglePacket_m54() {
     print_rec=0;
     if (length > 0) 
 	{
-		UDP_transmit (length);
+        test_to_data (length);
+        UDP_transmit (length);
         if (print_rec > 0) 
 		{
             printf("\nPacket end %d (0 - eop, 1 - eep)\nfrom MAC: %hhx:%hhx:%hhx:%hhx:%hhx:%hhx\n", end_packet, mac_tmp[0], mac_tmp[1], mac_tmp[2], mac_tmp[3], mac_tmp[4], mac_tmp[5]);
@@ -660,7 +692,7 @@ int run_WORK(void)
     unsigned char cmd;
     int key;
     unsigned mask_type = 0;
-	unsigned int i=0;
+    const char i=0;
 
     unsigned char mac_tmp[ETH_ALEN];
     unsigned char *mac_src, *mac_dst;
