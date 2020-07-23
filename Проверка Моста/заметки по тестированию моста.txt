@@ -1,0 +1,14 @@
+25-06-2020
+----------
+
+Запустить из папки SpW_Eth_reliz_ver_win_exe , программы bridge_app и example_receive_packets
+выставить в обоих программах номер карты к котрой подключён мост.
+*********************************************
+В программе example_receive_packets - 
+Do you want to get single packet from certain device?   - No
+
+в программе bridge_app -
+
+(2) Transmit Single Packet
+Enter packet sixe: например 100
+Enter path len:0 (?)

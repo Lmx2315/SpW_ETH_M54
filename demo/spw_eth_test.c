@@ -704,8 +704,8 @@ int run_WORK(void)
         printf("Current destination address of PC: %hhx:%hhx:%hhx:%hhx:%hhx:%hhx\n", mac_dst[0], mac_dst[1], mac_dst[2], mac_dst[3], mac_dst[4], mac_dst[5]);
         printf("Dest MAC adress of PC must be the same with Source MAC adress of Bridge \n");
         printf("==============================================\n");
-   
-	set_speed_m54(100);//скорость SW MBit/s 
+
+	
 	printf("Receiving packets from any device\n");
 	while (i==0)
 	{
@@ -910,6 +910,8 @@ int main(int argc, char *argv[])
 	int key=0;
     printf("M54 SW MOST : %s\n\n", PROGRAM_VERSION);
     rawsock = SpW_Socket_Init_Dialog();
+	set_speed_m54(400);//скорость SW MBit/s 
+	SpW_Eth_Set_Switch_Mode(rawsock,4,3);//задаём  режим работы портов ...
     register_ccode_event_handler(ccode_recv);
 	UDP_init();
     buf2 = malloc(BUF_SIZE);
