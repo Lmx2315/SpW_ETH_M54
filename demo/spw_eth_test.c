@@ -126,8 +126,12 @@ void UDP_work(int buf_size)
     dest_adr.sin_family     =AF_INET;
     dest_adr.sin_addr.s_addr=inet_addr("127.0.0.1");//адресс куда пересылаем данные
     dest_adr.sin_port       =htons(8888);//порт куда пересылаем данные
-
    sendto(my_sock,&buff,buf_size,0,(struct sockaddr *)&dest_adr, sizeof(dest_adr));
+
+   dest_adr.sin_family     =AF_INET;
+   dest_adr.sin_addr.s_addr=inet_addr("127.0.0.1");//адресс куда пересылаем данные
+   dest_adr.sin_port       =htons(8889);//порт куда пересылаем копию данных
+  sendto(my_sock,&buff,buf_size,0,(struct sockaddr *)&dest_adr, sizeof(dest_adr));
 }
 
 void UDP_transmit (int k)
